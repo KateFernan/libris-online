@@ -8,4 +8,4 @@ RUN mvn clean install
 
 EXPOSE 8080
 
-CMD ["mvn", "jpro:run", "-Djpro.port=8080"]
+CMD mvn jpro:run -Djpro.port=$PORT
