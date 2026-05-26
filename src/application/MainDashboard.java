@@ -193,10 +193,14 @@ public class MainDashboard {
                             return;
                         }
 
-                        File file = new File(filePath);
-
                         PDDocument document =
-                                Loader.loadPDF(file);
+                                Loader.loadPDF(
+                                        java.net.URI
+                                                .create(filePath)
+                                                .toURL()
+                                                .openStream()
+                                                .readAllBytes()
+                                );
 
                         PDFTextStripper stripper =
                                 new PDFTextStripper();
@@ -804,9 +808,15 @@ public class MainDashboard {
                     return;
                 }
 
-                File file = new File(filePath);
-
-                PDDocument document = Loader.loadPDF(file);
+                PDDocument document =
+                        Loader.loadPDF(
+                                java.net.URI
+                                        .create(filePath)
+                                        .toURL()
+                                        .openStream()
+                                        .readAllBytes()
+                        );
+                
                 PDFTextStripper stripper = new PDFTextStripper();
 
                 int totalPages = document.getNumberOfPages();
@@ -1463,13 +1473,25 @@ public class MainDashboard {
                 return;
             }
 
+            String cloudURL =
+                    CloudinaryService.uploadPDF(selectedFile[0]);
+
+            if (cloudURL == null) {
+                showMessage(
+                        messageLabel,
+                        "Failed to upload PDF to cloud.",
+                        false
+                );
+                return;
+            }
+
             String result = content.uploadContent(
                     currentUser,
                     title,
                     author,
                     genre,
                     desc,
-                    selectedFile[0].getAbsolutePath()
+                    cloudURL
             );
             
             boolean success = result.startsWith("Content uploaded");
@@ -1581,9 +1603,15 @@ public class MainDashboard {
                     return;
                 }
 
-                File file = new File(filePath);
-
-                PDDocument document = Loader.loadPDF(file);
+                PDDocument document =
+                        Loader.loadPDF(
+                                java.net.URI
+                                        .create(filePath)
+                                        .toURL()
+                                        .openStream()
+                                        .readAllBytes()
+                        );
+                
                 PDFTextStripper stripper = new PDFTextStripper();
 
                 int totalPages = document.getNumberOfPages();
