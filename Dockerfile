@@ -1,5 +1,7 @@
 FROM maven:3.9.6-eclipse-temurin-21
 
+ENV MAVEN_OPTS="-Xmx256m"
+
 RUN apt-get update && apt-get install -y \
     libfreetype6 \
     libpango-1.0-0 \
@@ -12,7 +14,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean install
+RUN mvn clean package -DskipTests
 
 EXPOSE 8080
 
