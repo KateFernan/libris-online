@@ -74,10 +74,34 @@ public class MainDashboard {
         tabs.getTabs().add(buildSearchTab());
         tabs.getTabs().add(buildDiscussionTab());
         tabs.getTabs().add(buildReviewTab());
-        tabs.getTabs().add(buildSubscriptionTab());
-        if (SubscriptionDAO.hasActiveSubscription(currentUser.getUsername())) {
-            tabs.getTabs().add(buildAIAssistantTab());
+        if (!AuthService.hasAccess(
+                currentUser,
+                Role.ADMIN,
+                Role.LIBRARIAN,
+                Role.CONTENT_MODERATOR
+        )) {
+
+            tabs.getTabs().add(
+                buildSubscriptionTab()
+            );
         }
+        if (
+        	    SubscriptionDAO.hasActiveSubscription(
+        	        currentUser.getUsername()
+        	    )
+        	    ||
+        	    AuthService.hasAccess(
+        	        currentUser,
+        	        Role.ADMIN,
+        	        Role.LIBRARIAN,
+        	        Role.CONTENT_MODERATOR
+        	    )
+        	) {
+
+        	    tabs.getTabs().add(
+        	        buildAIAssistantTab()
+        	    );
+        	}
         //Tabs based on your roles 
         if (AuthService.hasAccess(currentUser, Role.LIBRARIAN)) {
             tabs.getTabs().add(buildUploadContentTab());
@@ -758,6 +782,13 @@ public class MainDashboard {
             boolean isPremium =
                     SubscriptionDAO.hasActiveSubscription(
                             currentUser.getUsername()
+                    )
+                    ||
+                    AuthService.hasAccess(
+                            currentUser,
+                            Role.ADMIN,
+                            Role.LIBRARIAN,
+                            Role.CONTENT_MODERATOR
                     );
 
             if (searchedKeyword.isEmpty()) {
