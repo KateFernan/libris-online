@@ -1738,9 +1738,19 @@ public class MainDashboard {
                         PreparedStatement stmt =
                                 conn.prepareStatement(sql);
 
+                        String cloudURL =
+                                CloudinaryService.uploadPDF(newFile);
+
+                        if (cloudURL == null) {
+                            messageLabel.setText(
+                                "Failed to upload replacement PDF."
+                            );
+                            return;
+                        }
+
                         stmt.setString(
                             1,
-                            newFile.getAbsolutePath()
+                            cloudURL
                         );
 
                         stmt.setString(
