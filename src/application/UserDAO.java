@@ -149,4 +149,47 @@ public class UserDAO {
 
         return false;
     }
+    
+    public static User findUserByUsername(
+            String username
+    ) {
+
+        try(Connection conn = DBConnection.connect()) {
+
+            String sql = """
+                SELECT *
+                FROM public.users
+                WHERE LOWER(username)=LOWER(?)
+            """;
+
+            PreparedStatement stmt =
+                    conn.prepareStatement(sql);
+
+            stmt.setString(1, username);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()) {
+
+            	return new User(
+            	        rs.getInt("user_id"),
+            	        rs.getString("username"),
+            	        rs.getString("password"),
+            	        rs.getString("email"),
+            	        Role.valueOf(
+            	            rs.getString("role")
+            	        ),
+            	        rs.getBoolean("is_verified"),
+            	        rs.getBoolean("is_locked"),
+            	        rs.getInt("failed_login_attempts"),
+            	        rs.getBoolean("is_premium")
+            	);
+            }
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
+    } 
 }

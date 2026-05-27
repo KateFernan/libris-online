@@ -241,8 +241,58 @@ public class MainDashboard {
                         readerArea.setEditable(false);
                         readerArea.setPrefHeight(500);
 
+                        double percentage =
+                                ((double) currentPage[0] / totalPages) * 100;
+
+                        Label progressLabel = new Label(
+                                String.format("Progress: %.1f%%", percentage)
+                        );
+
+                        progressLabel.setFont(
+                                Font.font("Arial", FontWeight.BOLD, 14)
+                        );
+
+                        // buttons
+                        Button prevBtn = new Button("Previous Page");
+                        Button nextBtn = new Button("Next Page");
+                        Button closeBtn = new Button("Close Reader");
+                        Button bookmarkBtn = new Button("Bookmark Current Page");
+
+                        styleButton(prevBtn, "#3498db", "#fff");
+                        styleButton(nextBtn, "#27ae60", "#fff");
+                        styleButton(closeBtn, "#e74c3c", "#fff");
+                        styleButton(bookmarkBtn, "#f39c12", "#fff");
+                        
                         Runnable loadPage = () -> {
+
+                            if (!content.bookExists(title)) {
+
+                                try {
+                                    document.close();
+                                } catch(Exception ex){
+                                    ex.printStackTrace();
+                                }
+
+                                readerArea.setText(
+                                    "This book was deleted."
+                                );
+
+                                prevBtn.setDisable(true);
+                                nextBtn.setDisable(true);
+                                bookmarkBtn.setDisable(true);
+
+                                Alert alert = new Alert(
+                                    Alert.AlertType.ERROR,
+                                    "This book was deleted."
+                                );
+
+                                alert.showAndWait();
+
+                                return;
+                            }
+
                             try {
+
                                 stripper.setStartPage(
                                     currentPage[0]
                                 );
@@ -269,30 +319,8 @@ public class MainDashboard {
                                 ex.printStackTrace();
                             }
                         };
-
+                        
                         loadPage.run();
-
-                        double percentage =
-                                ((double) currentPage[0] / totalPages) * 100;
-
-                        Label progressLabel = new Label(
-                                String.format("Progress: %.1f%%", percentage)
-                        );
-
-                        progressLabel.setFont(
-                                Font.font("Arial", FontWeight.BOLD, 14)
-                        );
-
-                        // buttons
-                        Button prevBtn = new Button("Previous Page");
-                        Button nextBtn = new Button("Next Page");
-                        Button closeBtn = new Button("Close Reader");
-                        Button bookmarkBtn = new Button("Bookmark Current Page");
-
-                        styleButton(prevBtn, "#3498db", "#fff");
-                        styleButton(nextBtn, "#27ae60", "#fff");
-                        styleButton(closeBtn, "#e74c3c", "#fff");
-                        styleButton(bookmarkBtn, "#f39c12", "#fff");
 
                         Label bookmarkLabel = new Label();
 
@@ -881,32 +909,9 @@ public class MainDashboard {
                 	    Font.font("Arial", FontWeight.BOLD, 14)
                 	);
 
-
-                Runnable loadPage = () -> {
-                    try {
-                        stripper.setStartPage(currentPage[0]);
-                        stripper.setEndPage(currentPage[0]);
-
-                        String pageText = stripper.getText(document);
-
-                        readerArea.setText(
-                            "Page " + currentPage[0] + " of " + totalPages + "\n\n" +
-                            pageText
-                        );
-
-                        double updatedPercentage =
-                                ((double) currentPage[0] / totalPages) * 100;
-
-                        progressLabel.setText(
-                                String.format("Progress: %.1f%%", updatedPercentage)
-                        );
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                };
-
-                loadPage.run();
+                	Tab readerTab = new Tab("📖 " + actualTitle);
+                    readerTab.setClosable(true);
+                    TabPane parentTabs = (TabPane) tab.getTabPane();
 
                 Button prevBtn = new Button("Previous Page");
                 styleButton(prevBtn, "#3498db", "#fff");
@@ -919,6 +924,66 @@ public class MainDashboard {
 
                 Button bookmarkBtn = new Button("Bookmark Current Page");
                 styleButton(bookmarkBtn, "#f39c12", "#fff");
+                
+                Runnable loadPage = () -> {
+
+                    if (!content.bookExists(actualTitle)) {
+
+                        try {
+                            document.close();
+                        } catch(Exception ex){
+                            ex.printStackTrace();
+                        }
+
+                        readerArea.setText(
+                            "This book was deleted."
+                        );
+
+                        prevBtn.setDisable(true);
+                        nextBtn.setDisable(true);
+                        bookmarkBtn.setDisable(true);
+
+                        Alert alert = new Alert(
+                            Alert.AlertType.ERROR,
+                            "This book was deleted."
+                        );
+
+                        alert.showAndWait();
+
+                        parentTabs.getTabs().remove(readerTab);
+
+                        return;
+                    }
+
+                    try {
+
+                        stripper.setStartPage(currentPage[0]);
+                        stripper.setEndPage(currentPage[0]);
+
+                        String pageText = stripper.getText(document);
+
+                        readerArea.setText(
+                            "Page " + currentPage[0] +
+                            " of " + totalPages +
+                            "\n\n" + pageText
+                        );
+
+                        double updatedPercentage =
+                                ((double) currentPage[0] / totalPages) * 100;
+
+                        progressLabel.setText(
+                                String.format(
+                                    "Progress: %.1f%%",
+                                    updatedPercentage
+                                )
+                        );
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                };
+
+            loadPage.run();
 
                 Label bookmarkLabel = new Label();
 
@@ -1023,12 +1088,11 @@ public class MainDashboard {
 
                 readerLayout.setPadding(new Insets(20));
 
-                Tab readerTab = new Tab("📖 " + actualTitle);
-                readerTab.setClosable(true);
+                
                 readerTab.setContent(readerLayout);
 
                 // adds new reading tab dynamically
-                TabPane parentTabs = (TabPane) tab.getTabPane();
+            
                 parentTabs.getTabs().add(readerTab);
                 parentTabs.getSelectionModel().select(readerTab);
 
@@ -1846,6 +1910,18 @@ public class MainDashboard {
 
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, title);
+                
+                String bookmarkSql = """
+                	    DELETE FROM public.bookmarks
+                	    WHERE LOWER(book_title)=LOWER(?)
+                	""";
+
+                	PreparedStatement bookmarkStmt =
+                	        conn.prepareStatement(bookmarkSql);
+
+                	bookmarkStmt.setString(1, title);
+
+                	bookmarkStmt.executeUpdate();
 
                 int rows = stmt.executeUpdate();
 

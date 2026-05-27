@@ -267,4 +267,30 @@ public class ContentService {
 
         return keyword;
     }
+    
+    public boolean bookExists(String title) {
+
+        try(Connection conn = DBConnection.connect()) {
+
+            String sql = """
+                SELECT 1
+                FROM public.books
+                WHERE LOWER(title)=LOWER(?)
+            """;
+
+            PreparedStatement stmt =
+                    conn.prepareStatement(sql);
+
+            stmt.setString(1, title);
+
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
