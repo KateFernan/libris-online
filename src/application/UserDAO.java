@@ -177,8 +177,10 @@ public class UserDAO {
             	        rs.getString("password"),
             	        rs.getString("email"),
             	        Role.valueOf(
-            	            rs.getString("role")
-            	        ),
+            	        	    rs.getString("role")
+            	        	      .trim()
+            	        	      .toUpperCase()
+            	        	),
             	        rs.getBoolean("is_verified"),
             	        rs.getBoolean("is_locked"),
             	        rs.getInt("failed_login_attempts"),

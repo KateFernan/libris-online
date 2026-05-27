@@ -2122,6 +2122,30 @@ public class MainDashboard {
                 reportArea.setText("Enter a username.");
                 return;
             }
+            
+            if(username.equalsIgnoreCase(
+                    currentUser.getUsername()
+            )) {
+
+                reportArea.setText(
+                    "You cannot ban yourself."
+                );
+
+                return;
+            }
+
+            User targetUser =
+                    UserDAO.findUserByUsername(username);
+
+            if(targetUser != null &&
+                    targetUser.getRole() == Role.ADMIN) {
+
+                reportArea.setText(
+                    "Admins cannot ban other admins."
+                );
+
+                return;
+            }
 
             boolean success = UserDAO.banUser(username);
 
