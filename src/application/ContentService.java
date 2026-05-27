@@ -48,8 +48,8 @@ public class ContentService {
             int userId = rs.getInt("user_id");
 
             PreparedStatement stmt = conn.prepareStatement("""
-            	    INSERT INTO public.books(title, author, genre, description, uploaded_by, file_path)
-            	    VALUES (?, ?, ?, ?, ?, ?)
+            	    INSERT INTO public.books(title, author, genre, description, uploaded_by, file_path, status)
+            	    VALUES (?, ?, ?, ?, ?, ?, ?)
             	""");
 
             stmt.setString(1, title);
@@ -58,7 +58,7 @@ public class ContentService {
             stmt.setString(4, desc);
             stmt.setInt(5, userId);
             stmt.setString(6, filePath); 
-            
+            stmt.setString(7,  "AVAILABLE");            
 
             stmt.executeUpdate();
             
