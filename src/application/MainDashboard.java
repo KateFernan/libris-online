@@ -423,6 +423,12 @@ public class MainDashboard {
 
                             closeBtn.setOnAction(event -> {
                                 finalParentTabs.getTabs().remove(readerTab);
+                                
+                                try {
+                                    document.close();
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
                             });
                         }
 
@@ -997,6 +1003,12 @@ public class MainDashboard {
 
                 closeBtn.setOnAction(event -> {
                     parentTabs.getTabs().remove(readerTab);
+                    
+                    try {
+                        document.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 });
 
             } catch (Exception ex) {
