@@ -290,7 +290,7 @@ public class MainDashboard {
                                 	    "This book was deleted. Reader will close."
                                 	);
 
-                                	alert.showAndWait();
+                                	alert.show();
 
                                 	javafx.application.Platform.runLater(() -> {
 
@@ -970,7 +970,7 @@ public class MainDashboard {
                         	    "This book was deleted. Reader will close."
                         	);
 
-                        	alert.showAndWait();
+                        	alert.show();
 
                         	javafx.application.Platform.runLater(() -> {
 
@@ -1800,7 +1800,7 @@ public class MainDashboard {
                             "This book was deleted. Reader will close."
                         );
 
-                        alert.showAndWait();
+                        alert.show();
 
                         javafx.application.Platform.runLater(() -> {
 
