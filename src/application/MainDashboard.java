@@ -263,32 +263,46 @@ public class MainDashboard {
                         styleButton(closeBtn, "#e74c3c", "#fff");
                         styleButton(bookmarkBtn, "#f39c12", "#fff");
                         
+                        Tab readerTab = new Tab("📖 " + title);
+                        readerTab.setClosable(true);
+                        
                         Runnable loadPage = () -> {
 
                             if (!content.bookExists(title)) {
 
-                                try {
-                                    document.close();
-                                } catch(Exception ex){
-                                    ex.printStackTrace();
-                                }
-
                                 readerArea.setText(
-                                    "This book was deleted."
-                                );
+                                	    "This book was deleted."
+                                	);
 
-                                prevBtn.setDisable(true);
-                                nextBtn.setDisable(true);
-                                bookmarkBtn.setDisable(true);
+                                	prevBtn.setDisable(true);
+                                	nextBtn.setDisable(true);
+                                	bookmarkBtn.setDisable(true);
+                                	closeBtn.setDisable(true);
 
-                                Alert alert = new Alert(
-                                    Alert.AlertType.ERROR,
-                                    "This book was deleted."
-                                );
+                                	try {
+                                	    document.close();
+                                	} catch(Exception ex){
+                                	    ex.printStackTrace();
+                                	}
 
-                                alert.showAndWait();
+                                	Alert alert = new Alert(
+                                	    Alert.AlertType.ERROR,
+                                	    "This book was deleted. Reader will close."
+                                	);
 
-                                return;
+                                	alert.showAndWait();
+
+                                	javafx.application.Platform.runLater(() -> {
+
+                                	    if(readerTab.getTabPane() != null){
+                                	        readerTab.getTabPane()
+                                	                 .getTabs()
+                                	                 .remove(readerTab);
+                                	    }
+
+                                	});
+
+                                	return;
                             }
 
                             try {
@@ -448,9 +462,16 @@ public class MainDashboard {
                                 new Insets(20)
                         );
 
-                        Tab readerTab = new Tab("📖 " + title);
-                        readerTab.setClosable(true);
+                        
                         readerTab.setContent(readerLayout);
+                        
+                        readerTab.setOnClosed(ev -> {
+                            try {
+                                document.close();
+                            } catch(Exception ex){
+                                ex.printStackTrace();
+                            }
+                        });
 
                         Scene currentScene = continueBtn.getScene();
 
@@ -929,30 +950,39 @@ public class MainDashboard {
 
                     if (!content.bookExists(actualTitle)) {
 
-                        try {
-                            document.close();
-                        } catch(Exception ex){
-                            ex.printStackTrace();
-                        }
-
                         readerArea.setText(
-                            "This book was deleted."
-                        );
+                        	    "This book was deleted."
+                        	);
 
-                        prevBtn.setDisable(true);
-                        nextBtn.setDisable(true);
-                        bookmarkBtn.setDisable(true);
+                        	prevBtn.setDisable(true);
+                        	nextBtn.setDisable(true);
+                        	bookmarkBtn.setDisable(true);
+                        	closeBtn.setDisable(true);
 
-                        Alert alert = new Alert(
-                            Alert.AlertType.ERROR,
-                            "This book was deleted."
-                        );
+                        	try {
+                        	    document.close();
+                        	} catch(Exception ex){
+                        	    ex.printStackTrace();
+                        	}
 
-                        alert.showAndWait();
+                        	Alert alert = new Alert(
+                        	    Alert.AlertType.ERROR,
+                        	    "This book was deleted. Reader will close."
+                        	);
 
-                        parentTabs.getTabs().remove(readerTab);
+                        	alert.showAndWait();
 
-                        return;
+                        	javafx.application.Platform.runLater(() -> {
+
+                        	    if(readerTab.getTabPane() != null){
+                        	        readerTab.getTabPane()
+                        	                 .getTabs()
+                        	                 .remove(readerTab);
+                        	    }
+
+                        	});
+
+                        	return;
                     }
 
                     try {
@@ -1090,6 +1120,13 @@ public class MainDashboard {
 
                 
                 readerTab.setContent(readerLayout);
+                readerTab.setOnClosed(ev -> {
+                    try {
+                        document.close();
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                });
 
                 // adds new reading tab dynamically
             
@@ -1729,8 +1766,57 @@ public class MainDashboard {
                 readerArea.setEditable(false);
                 readerArea.setPrefHeight(500);
 
+                Button prevBtn = new Button("Previous Page");
+                Button nextBtn = new Button("Next Page");
+                Button closeBtn = new Button("Close Reader");
+
+                styleButton(prevBtn, "#3498db", "#fff");
+                styleButton(nextBtn, "#27ae60", "#fff");
+                styleButton(closeBtn, "#e74c3c", "#fff");
+                
+                Tab readerTab = new Tab("📖 " + actualTitle);
+                readerTab.setClosable(true);
+                
                 Runnable loadPage = () -> {
+
+                    if (!content.bookExists(actualTitle)) {
+
+                        readerArea.setText(
+                            "This book was deleted."
+                        );
+
+                        prevBtn.setDisable(true);
+                        nextBtn.setDisable(true);
+                        closeBtn.setDisable(true);
+
+                        try {
+                            document.close();
+                        } catch(Exception ex){
+                            ex.printStackTrace();
+                        }
+
+                        Alert alert = new Alert(
+                            Alert.AlertType.ERROR,
+                            "This book was deleted. Reader will close."
+                        );
+
+                        alert.showAndWait();
+
+                        javafx.application.Platform.runLater(() -> {
+
+                            if(readerTab.getTabPane() != null){
+                                readerTab.getTabPane()
+                                         .getTabs()
+                                         .remove(readerTab);
+                            }
+
+                        });
+
+                        return;
+                    }
+
                     try {
+
                         stripper.setStartPage(currentPage[0]);
                         stripper.setEndPage(currentPage[0]);
 
@@ -1745,16 +1831,8 @@ public class MainDashboard {
                         ex.printStackTrace();
                     }
                 };
-
+                
                 loadPage.run();
-
-                Button prevBtn = new Button("Previous Page");
-                Button nextBtn = new Button("Next Page");
-                Button closeBtn = new Button("Close Reader");
-
-                styleButton(prevBtn, "#3498db", "#fff");
-                styleButton(nextBtn, "#27ae60", "#fff");
-                styleButton(closeBtn, "#e74c3c", "#fff");
 
                 prevBtn.setOnAction(ev -> {
                     if(currentPage[0] > 1){
@@ -1770,8 +1848,7 @@ public class MainDashboard {
                     }
                 });
 
-                Tab readerTab = new Tab("📖 " + actualTitle);
-                readerTab.setClosable(true);
+                
 
                 VBox readerLayout = new VBox(
                     15,
@@ -1782,6 +1859,13 @@ public class MainDashboard {
 
                 readerLayout.setPadding(new Insets(20));
                 readerTab.setContent(readerLayout);
+                readerTab.setOnClosed(ev -> {
+                    try {
+                        document.close();
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                });
 
                 TabPane parentTabs = (TabPane) tab.getTabPane();
                 parentTabs.getTabs().add(readerTab);
